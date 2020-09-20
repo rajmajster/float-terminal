@@ -3,7 +3,7 @@ local api = vim.api
 local buf, win
 
 local function printHelloNvim()
-		print(vim.api.nvim_win_get_width(0))
+		print(api.nvim_win_get_width(0))
 		print("hello nvim! aaa")
 end
 
@@ -31,12 +31,18 @@ local function open_window()
 end
 
 local function update_view()
-		vim.api.nvim_buf_set_option(buf, 'modifiable', true)
-		local result = vim.api.nvim_call_function('systemlist', {
+		api.nvim_buf_set_option(buf, 'modifiable', true)
+		local result = api.nvim_call_function('systemlist', {
 				'ls'
 		})
 		api.nvim_buf_set_lines(buf, 0, -1, false, result)
-		vim.api.nvim_buf_set_option(buf, 'modifiable', false)
+		--api.nvim_set_current_buf(buf)
+		--api.nvim_call_function("termopen", {"/bin/zsh"})
+		--api.nvim_buf_set_option(buf, 'modifiable', false)
+end
+
+local function close_window()
+  api.nvim_win_close(win, true)
 end
 
 local function set_mappings()
@@ -45,7 +51,7 @@ local function set_mappings()
 		}
 
 		for k,v in pairs(mappings) do
-				api.nvim_buf_set_keymap(buf, 'n', k, ':lua require"whid".'..v..'<cr>', {
+				api.nvim_buf_set_keymap(buf, 'n', k, ':lua require"float-terminal".'..v..'<cr>', {
 						nowait = true, noremap = true, silent = true
 				})
 		end
@@ -62,12 +68,14 @@ end
 local function printFloatTerminal()
 		open_window()
 		set_mappings()
-		update_view()
+		api.nvim_call_function("termopen", {"/bin/zsh"})
+		-- update_view()
 end
 
 return {
 		printHelloNvim = printHelloNvim,
 		printFloatTerminal = printFloatTerminal,
-		update_view = update_view
+		update_view = update_view,
+		close_window = close_window
 }
 
